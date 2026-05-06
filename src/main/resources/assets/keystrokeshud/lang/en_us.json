@@ -1,1 +1,5 @@
-
+{
+  "key.keystrokeshud.open_menu": "Open KeystrokesHUD Menu",
+  "category.keystrokeshud": "KeystrokesHUD",
+  "mod.keystrokeshud.name": "KeystrokesHUD"
+}
