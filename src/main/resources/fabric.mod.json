@@ -1,1 +1,31 @@
-
+{
+  "schemaVersion": 1,
+  "id": "keystrokeshud",
+  "version": "${version}",
+  "name": "KeystrokesHUD",
+  "description": "A premium, fully customizable Keystrokes + CPS + FPS HUD for Minecraft 1.21.4",
+  "authors": ["KeystrokesHUD"],
+  "contact": {
+    "sources": "https://github.com/your-username/keystrokeshud"
+  },
+  "license": "MIT",
+  "icon": "assets/keystrokeshud/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.keystrokeshud.KeystrokesHudClient"
+    ]
+  },
+  "mixins": [
+    "keystrokeshud.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

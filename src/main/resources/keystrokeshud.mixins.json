@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.keystrokeshud.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "MouseMixin",
+    "GameRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
