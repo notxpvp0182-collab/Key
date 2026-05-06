@@ -14,19 +14,12 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * KeystrokesHUD — Client-side entrypoint.
- * Registers all hooks, keybinds, and initialises subsystems.
- */
 public class KeystrokesHudClient implements ClientModInitializer {
 
     public static final String MOD_ID = "keystrokeshud";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    /** Keybind to open the HUD configuration menu. */
     public static KeyBinding openMenuKey;
-
-    /** Singleton references used by renderers and screens. */
     public static HudConfig config;
     public static HudManager hudManager;
     public static InputTracker inputTracker;
@@ -34,17 +27,13 @@ public class KeystrokesHudClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        LOGGER.info("[KeystrokesHUD] Initialising…");
+        LOGGER.info("[KeystrokesHUD] Initialising...");
 
-        // 1. Load / create configuration from disk.
         config = HudConfig.loadOrCreate();
-
-        // 2. Initialise subsystems.
-        fpsTracker  = new FpsTracker();
+        fpsTracker = new FpsTracker();
         inputTracker = new InputTracker();
-        hudManager  = new HudManager(config, inputTracker, fpsTracker);
+        hudManager = new HudManager(config, inputTracker, fpsTracker);
 
-        // 3. Register the menu keybind (default: K).
         openMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.keystrokeshud.open_menu",
                 InputUtil.Type.KEYSYM,
@@ -52,19 +41,15 @@ public class KeystrokesHudClient implements ClientModInitializer {
                 "category.keystrokeshud"
         ));
 
-        // 4. Per-tick update (20 Hz) — used for CPS decay & other cheap updates.
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             hudManager.onTick(client);
-
-            // Open menu when keybind is pressed.
             if (openMenuKey.wasPressed()) {
                 client.setScreen(new com.keystrokeshud.screen.HudConfigScreen(client.currentScreen));
             }
         });
 
-        // 5. Register HUD renderer — called every rendered frame.
-        HudRenderCallback.EVENT.register((drawContext, tickDelta) ->
-                hudManager.render(drawContext, tickDelta));
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) ->
+                hudManager.render(drawContext, tickCounter));
 
         LOGGER.info("[KeystrokesHUD] Ready.");
     }
