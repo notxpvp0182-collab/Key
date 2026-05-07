@@ -28,7 +28,7 @@ public class ColorEditorScreen extends Screen {
             final int idx = i;
             addDrawableChild(ButtonWidget.builder(
                     Text.literal(NAMES[i]),
-                    btn -> { selectedElement = idx; rebuildWidgets(); })
+                    btn -> { selectedElement = idx; clearAndInit(); })
                     .dimensions(8 + i * 38, 8, 36, 14).build());
         }
 
@@ -60,7 +60,7 @@ public class ColorEditorScreen extends Screen {
 
         // Border thickness slider
         addDrawableChild(new SliderWidget(x, y, w, h,
-                Text.literal("Border Thickness: " + cfg.borderThickness),
+                Text.literal("Border: " + cfg.borderThickness),
                 cfg.borderThickness / 4.0) {
             @Override protected void updateMessage() {
                 setMessage(Text.literal("Border: " + Math.max(1,(int)(value*4))));
@@ -72,7 +72,7 @@ public class ColorEditorScreen extends Screen {
 
         // Corner radius slider
         addDrawableChild(new SliderWidget(x, y, w, h,
-                Text.literal("Corner Radius: " + cfg.cornerRadius),
+                Text.literal("Radius: " + cfg.cornerRadius),
                 cfg.cornerRadius / 8.0) {
             @Override protected void updateMessage() {
                 setMessage(Text.literal("Radius: " + (int)(value*8)));
@@ -93,10 +93,12 @@ public class ColorEditorScreen extends Screen {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         renderBackground(ctx, mouseX, mouseY, delta);
         ctx.fill(0, 0, width, height, 0xCC111122);
-        ctx.drawCenteredTextWithShadow(textRenderer, "Color Editor — " + NAMES[selectedElement], width / 2, 1, 0xFF88AAFF);
+        ctx.drawCenteredTextWithShadow(textRenderer,
+                "Color Editor — " + NAMES[selectedElement],
+                width / 2, 1, 0xFF88AAFF);
         super.render(ctx, mouseX, mouseY, delta);
     }
 
     @Override
     public void close() { cfg.save(); client.setScreen(parent); }
-                    }
+            }
