@@ -44,9 +44,9 @@ public class HudConfigScreen extends Screen {
         addToggle(x, y, bw, bh, "Performance Mode", config.performanceMode,v -> { config.performanceMode = v;  save(); }); y += bh + gap + 4;
 
         addDrawableChild(ButtonWidget.builder(
-                Text.literal("Reset Layout"),
-                btn -> { config.resetLayout(); rebuildWidgets(); })
-                .dimensions(x, y, bw, bh).build()); y += bh + gap;
+        Text.literal("Reset Layout"),
+        btn -> { config.resetLayout(); clearAndInit(); })
+        .dimensions(x, y, bw, bh).build()); y += bh + gap;
 
         addDrawableChild(ButtonWidget.builder(
                 Text.literal("Color Editor..."),
