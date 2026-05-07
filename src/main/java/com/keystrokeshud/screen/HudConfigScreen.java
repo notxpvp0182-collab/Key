@@ -438,4 +438,85 @@ public class HudConfigScreen extends Screen {
             case A -> new int[]{config.wA,config.hA};
             case S -> new int[]{config.wS,config.hS};
             case D -> new int[]{config.wD,config.hD};
-            case LMB -
+            case LMB -> new int[]{config.wLMB,config.hLMB};
+            case RMB -> new int[]{config.wRMB,config.hRMB};
+            case FPS -> new int[]{config.wFPS,config.hFPS};
+            default -> new int[]{0,0};
+        };
+    }
+
+    private int getRadius(DragTarget t) {
+        return switch(t) {
+            case W->config.rW; case A->config.rA; case S->config.rS; case D->config.rD;
+            case LMB->config.rLMB; case RMB->config.rRMB; case FPS->config.rFPS;
+            default->0;
+        };
+    }
+
+    private int getTextColor(DragTarget t) {
+        return switch(t) {
+            case W->config.colorTextW; case A->config.colorTextA;
+            case S->config.colorTextS; case D->config.colorTextD;
+            case LMB->config.colorTextLMB; case RMB->config.colorTextRMB;
+            case FPS->config.colorTextFPS; default->0xFFFFFFFF;
+        };
+    }
+
+    private void setTextColor(DragTarget t, int color) {
+        switch(t) {
+            case W->config.colorTextW=color; case A->config.colorTextA=color;
+            case S->config.colorTextS=color; case D->config.colorTextD=color;
+            case LMB->config.colorTextLMB=color; case RMB->config.colorTextRMB=color;
+            case FPS->config.colorTextFPS=color;
+        }
+    }
+
+    private DragTarget hitTest(float mx, float my) {
+        if(hits(mx,my,config.xW,  config.yW,  config.wW,  config.hW))  return DragTarget.W;
+        if(hits(mx,my,config.xA,  config.yA,  config.wA,  config.hA))  return DragTarget.A;
+        if(hits(mx,my,config.xS,  config.yS,  config.wS,  config.hS))  return DragTarget.S;
+        if(hits(mx,my,config.xD,  config.yD,  config.wD,  config.hD))  return DragTarget.D;
+        if(hits(mx,my,config.xLMB,config.yLMB,config.wLMB,config.hLMB))return DragTarget.LMB;
+        if(hits(mx,my,config.xRMB,config.yRMB,config.wRMB,config.hRMB))return DragTarget.RMB;
+        if(hits(mx,my,config.xFPS,config.yFPS,config.wFPS,config.hFPS))return DragTarget.FPS;
+        return DragTarget.NONE;
+    }
+
+    private static boolean hits(float mx,float my,float ex,float ey,int ew,int eh) {
+        return mx>=ex&&mx<ex+ew&&my>=ey&&my<ey+eh;
+    }
+
+    private float[] getPos(DragTarget t) {
+        return switch(t) {
+            case W->new float[]{config.xW,config.yW};
+            case A->new float[]{config.xA,config.yA};
+            case S->new float[]{config.xS,config.yS};
+            case D->new float[]{config.xD,config.yD};
+            case LMB->new float[]{config.xLMB,config.yLMB};
+            case RMB->new float[]{config.xRMB,config.yRMB};
+            case FPS->new float[]{config.xFPS,config.yFPS};
+            default->new float[]{0,0};
+        };
+    }
+
+    private void setPos(DragTarget t, float x, float y) {
+        switch(t) {
+            case W->{config.xW=x;config.yW=y;}
+            case A->{config.xA=x;config.yA=y;}
+            case S->{config.xS=x;config.yS=y;}
+            case D->{config.xD=x;config.yD=y;}
+            case LMB->{config.xLMB=x;config.yLMB=y;}
+            case RMB->{config.xRMB=x;config.yRMB=y;}
+            case FPS->{config.xFPS=x;config.yFPS=y;}
+        }
+    }
+
+    private String targetName(DragTarget t) {
+        return switch(t) {
+            case W->"W"; case A->"A"; case S->"S"; case D->"D";
+            case LMB->"LMB"; case RMB->"RMB"; case FPS->"FPS"; default->"";
+        };
+    }
+
+    private void save() { config.save(); }
+        }
