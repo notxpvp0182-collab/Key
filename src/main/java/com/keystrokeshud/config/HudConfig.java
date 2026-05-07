@@ -9,110 +9,77 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Path;
 
-/**
- * HudConfig — Persistent configuration model.
- *
- * All positional, colour, and feature-toggle data lives here.
- * Serialised to JSON via Gson; loaded automatically on startup.
- *
- * Design note: primitive fields are used deliberately so Gson can
- * handle them without custom adapters, keeping the dependency footprint
- * minimal and the load path exception-safe.
- */
 public class HudConfig {
 
-    // ─── Internal ────────────────────────────────────────────────────────────
-    private static final Logger  LOGGER  = LoggerFactory.getLogger("keystrokeshud-config");
-    private static final Gson    GSON    = new GsonBuilder().setPrettyPrinting().create();
-    private static final String  FILE    = "keystrokeshud.json";
+    private static final Logger LOGGER = LoggerFactory.getLogger("keystrokeshud-config");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final String FILE = "keystrokeshud.json";
 
-    // ─── Feature toggles ─────────────────────────────────────────────────────
-    public boolean showW    = true;
-    public boolean showA    = true;
-    public boolean showS    = true;
-    public boolean showD    = true;
-    public boolean showLMB  = true;
-    public boolean showRMB  = true;
-    public boolean showFPS  = true;
-    public boolean showCPS  = true;  // show CPS value inside LMB/RMB keys
+    // Feature toggles
+    public boolean showW = true, showA = true, showS = true, showD = true;
+    public boolean showLMB = true, showRMB = true, showFPS = true, showCPS = true;
 
-    // ─── Positions (pixels from top-left) ────────────────────────────────────
-    // Default layout: compact keystrokes cluster bottom-left + FPS top-left.
-    public float xW    = 10; public float yW    = 100;
-    public float xA    = 10; public float yA    = 126;
-    public float xS    = 36; public float yS    = 126;
-    public float xD    = 62; public float yD    = 126;
-    public float xLMB  = 10; public float yLMB  = 152;
-    public float xRMB  = 62; public float yRMB  = 152;
-    public float xFPS  = 10; public float yFPS  = 10;
+    // Positions
+    public float xW=10,yW=100, xA=10,yA=126, xS=36,yS=126, xD=62,yD=126;
+    public float xLMB=10,yLMB=152, xRMB=62,yRMB=152, xFPS=10,yFPS=10;
 
-    // ─── Colours (ARGB int, packed) ───────────────────────────────────────────
-    // Text colours per element
-    public int colorTextW    = 0xFFFFFFFF;
-    public int colorTextA    = 0xFFFFFFFF;
-    public int colorTextS    = 0xFFFFFFFF;
-    public int colorTextD    = 0xFFFFFFFF;
-    public int colorTextLMB  = 0xFFFFFFFF;
-    public int colorTextRMB  = 0xFFFFFFFF;
-    public int colorTextFPS  = 0xFF00FF88;
+    // Individual sizes for each element
+    public int wW=24,hW=24;
+    public int wA=24,hA=24;
+    public int wS=24,hS=24;
+    public int wD=24,hD=24;
+    public int wLMB=50,hLMB=24;
+    public int wRMB=50,hRMB=24;
+    public int wFPS=54,hFPS=18;
 
-    // Pressed background colour (all elements share one pressed colour for cohesion)
-    public int colorPressed = 0xFF4466FF;
+    // Individual corner radius for each element
+    public int rW=4,rA=4,rS=4,rD=4,rLMB=4,rRMB=4,rFPS=4;
 
-    // Idle background colour
-    public int colorIdle    = 0x99222222;
+    // Text colors
+    public int colorTextW=0xFFFFFFFF, colorTextA=0xFFFFFFFF;
+    public int colorTextS=0xFFFFFFFF, colorTextD=0xFFFFFFFF;
+    public int colorTextLMB=0xFFFFFFFF, colorTextRMB=0xFFFFFFFF;
+    public int colorTextFPS=0xFF00FF88;
 
-    // Border colour per element
-    public int borderColorW    = 0xFF555577;
-    public int borderColorA    = 0xFF555577;
-    public int borderColorS    = 0xFF555577;
-    public int borderColorD    = 0xFF555577;
-    public int borderColorLMB  = 0xFF555577;
-    public int borderColorRMB  = 0xFF555577;
-    public int borderColorFPS  = 0xFF555577;
+    // Border colors per element
+    public int borderColorW=0xFF555577, borderColorA=0xFF555577;
+    public int borderColorS=0xFF555577, borderColorD=0xFF555577;
+    public int borderColorLMB=0xFF555577, borderColorRMB=0xFF555577;
+    public int borderColorFPS=0xFF555577;
 
-    // ─── Background / Border settings ────────────────────────────────────────
-    public float backgroundOpacity = 0.6f;   // 0.0 – 1.0
-    public boolean showBorders      = true;
-    public int    borderThickness   = 1;      // pixels
+    // Global colors
+    public int colorPressed=0xFF4466FF;
+    public int colorIdle=0x99222222;
 
-    // ─── RGB / Rainbow mode ───────────────────────────────────────────────────
-    public boolean rainbowMode       = false;
-    public float   rainbowSpeed      = 1.0f;  // cycles per second
+    // Background & border
+    public float backgroundOpacity=0.6f;
+    public boolean showBorders=true;
+    public int borderThickness=1;
 
-    // ─── UI Lock / Grid snap ──────────────────────────────────────────────────
-    public boolean lockPositions = false;
-    public boolean snapToGrid    = false;
-    public int     gridSize      = 8;         // pixels
+    // Rainbow
+    public boolean rainbowMode=false;
+    public float rainbowSpeed=1.0f;
 
-    // ─── Performance mode ─────────────────────────────────────────────────────
-    public boolean performanceMode  = false;  // disables animations & rainbow
+    // UI
+    public boolean lockPositions=false;
+    public boolean snapToGrid=false;
+    public int gridSize=8;
+    public boolean performanceMode=false;
 
-    // ─── Element sizes ────────────────────────────────────────────────────────
-    public int keyWidth   = 24;
-    public int keyHeight  = 24;
-    public int lmbWidth   = 50;
-    public int lmbHeight  = 24;
-    public int fpsWidth   = 54;
-    public int fpsHeight  = 18;
+    // Legacy (kept for compatibility)
+    public int keyWidth=24, keyHeight=24;
+    public int lmbWidth=50, lmbHeight=24;
+    public int fpsWidth=54, fpsHeight=18;
+    public int cornerRadius=4;
 
-    // ─── Corner radius ────────────────────────────────────────────────────────
-    public int cornerRadius = 4;
-
-    // ─── IO ───────────────────────────────────────────────────────────────────
-
-    /** Load config from disk, or return a fresh default instance. */
     public static HudConfig loadOrCreate() {
         Path path = configPath();
         if (path.toFile().exists()) {
             try (Reader r = new FileReader(path.toFile())) {
                 HudConfig cfg = GSON.fromJson(r, HudConfig.class);
-                if (cfg != null) {
-                    LOGGER.info("[KeystrokesHUD] Config loaded from {}", path);
-                    return cfg;
-                }
+                if (cfg != null) return cfg;
             } catch (Exception e) {
-                LOGGER.warn("[KeystrokesHUD] Failed to load config, using defaults: {}", e.getMessage());
+                LOGGER.warn("Failed to load config: {}", e.getMessage());
             }
         }
         HudConfig cfg = new HudConfig();
@@ -120,29 +87,21 @@ public class HudConfig {
         return cfg;
     }
 
-    /** Persist config to disk. Called after any settings change. */
     public void save() {
         Path path = configPath();
         try {
-            //noinspection ResultOfMethodCallIgnored
             path.getParent().toFile().mkdirs();
             try (Writer w = new FileWriter(path.toFile())) {
                 GSON.toJson(this, w);
             }
         } catch (Exception e) {
-            LOGGER.error("[KeystrokesHUD] Failed to save config: {}", e.getMessage());
+            LOGGER.error("Failed to save config: {}", e.getMessage());
         }
     }
 
-    /** Reset all element positions to their defaults. */
     public void resetLayout() {
-        xW = 10; yW = 100;
-        xA = 10; yA = 126;
-        xS = 36; yS = 126;
-        xD = 62; yD = 126;
-        xLMB = 10; yLMB = 152;
-        xRMB = 62; yRMB = 152;
-        xFPS = 10; yFPS = 10;
+        xW=10;yW=100; xA=10;yA=126; xS=36;yS=126; xD=62;yD=126;
+        xLMB=10;yLMB=152; xRMB=62;yRMB=152; xFPS=10;yFPS=10;
         save();
     }
 
